@@ -13,8 +13,3 @@ with open(datajson) as json_data:
 dic={}
 for i in range(len(d)):
     dic[d[i].get('image_id')]=int(d[i].get('label_id'))
-
-test=np.empty((len(d),2),dtype="<U50")
-for i in range(len(d)):
-    test[i,0]=d[i].get('image_id')
-    test[i,1]=d[i].get('label_id')
