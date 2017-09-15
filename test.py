@@ -6,7 +6,9 @@ Created on Sun Sep 10 10:02:33 2017
 """
 
 import json
-datajson="../data/scene_train_annotations_20170904.json"
+datajson="../data/scene_validation_annotations_20170908.json"
+traindir="../data/scene_train_images_20170904"
+testdir="../data/scene_validation_images_20170908"
 with open(datajson) as json_data:
     d = json.load(json_data)
 
