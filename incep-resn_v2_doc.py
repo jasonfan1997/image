@@ -7,6 +7,7 @@ from keras.models import Model, Sequential
 from keras.layers import Dense, GlobalAveragePooling2D, Dropout, Flatten, Input
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
+from keras.metrics import top_k_categorical_accuracy, sparse_top_k_categorical_accuracy
 import keras
 import numpy as np
 
@@ -21,7 +22,8 @@ nb_validation_samples = 800
 epochs = 50
 batch_size = 20
 
-
+def top_3_categorical_accuracy(y_true, y_pred, k=3):
+    return K.mean(K.in_top_k(y_pred, K.argmax(y_true, axis=-1), k))
 
 # create the base pre-trained model
 #base_model = InceptionResNetV2(weights='imagenet', include_top=False)
@@ -62,7 +64,7 @@ model.summary()
 
 # compile the model (should be done *after* setting layers to non-trainable)
 #default: rmsprop
-model.compile(optimizer=keras.optimizers.RMSprop(lr=0.0005), loss='sparse_categorical_crossentropy')
+model.compile(optimizer=keras.optimizers.RMSprop(lr=0.0005), loss='sparse_categorical_crossentropy', metrics=['accuracy', top_3_categorical_accuracy])
 
 
 model.fit_generator(generator, 20)

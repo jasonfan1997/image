@@ -8,6 +8,7 @@ from keras.models import Model, Sequential
 from keras.layers import Dense, GlobalAveragePooling2D,Dropout, Flatten
 from keras import backend as K
 from keras.preprocessing.image import ImageDataGenerator
+from keras.metrics import top_k_categorical_accuracy, sparse_top_k_categorical_accuracy
 from keras import applications
 import keras
 import numpy as np
@@ -25,6 +26,8 @@ nb_validation_samples = 800
 epochs = 50
 batch_size = 20
 
+def top_3_categorical_accuracy(y_true, y_pred, k=3):
+    return K.mean(K.in_top_k(y_pred, K.argmax(y_true, axis=-1), k))
 
 def save_features():
     datagen = ImageDataGenerator(rescale=1. / 255)
@@ -72,7 +75,7 @@ def train_top_model():
     model.add(Dropout(0.5))
     model.add(Dense(80, activation='softmax'))
 
-    model.compile(optimizer=keras.optimizers.RMSProp(lr=0.0005), loss='categorical_crossentropy')
+    model.compile(optimizer=keras.optimizers.RMSProp(lr=0.0005), loss='categorical_crossentropy', metrics=['accuracy', top_3_categorical_accuracy])
 
     model.fit(train_data, train_labels,
               epochs=epochs,
