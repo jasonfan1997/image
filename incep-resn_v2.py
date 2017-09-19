@@ -72,7 +72,7 @@ def train_top_model():
     # array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     model = Sequential()
     #model.add(Flatten(input_shape=train_data.shape[1:]))
-    model.add(Dropout(0.5))
+    model.add(Dropout(0.5, input_shape=(None, 1536)))
     model.add(Dense(80, activation='softmax'))
 
     model.compile(optimizer=keras.optimizers.RMSProp(lr=0.0005), loss='categorical_crossentropy', metrics=['accuracy', top_3_categorical_accuracy])
