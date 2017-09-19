@@ -22,7 +22,7 @@ validation_data_dir = '../data/scene_classification/scene_validation_images_2017
 train_labels = np.load('training_labels.npy')
 validation_labels = np.load('validation_labels.npy')
 nb_train_samples = len(train_labels)
-nb_validation_samples = 800
+nb_validation_samples = 7120
 epochs = 50
 batch_size = 20
 
@@ -40,6 +40,7 @@ def save_features():
         batch_size=batch_size,
         class_mode=None,
         shuffle=False)
+    
     bottleneck_features_train = model.predict_generator(
         generator, 1 + nb_train_samples // batch_size, verbose=1)
     #+1 in order not to lose the last batch
@@ -47,7 +48,7 @@ def save_features():
     
     np.save('bottleneck_features_train.npy', bottleneck_features_train)
     #the array will have size (no. of samples, 1536)
-
+    
 
 
     #save_validation_features:
@@ -63,6 +64,9 @@ def save_features():
 
 
 def train_top_model():
+    np.random.seed(1)
+    global train_labels
+    global validation_labels
     train_data = np.load('bottleneck_features_train.npy')
     #train_labels = np.array([0] * (nb_train_samples / 2) + [1] * (nb_train_samples / 2))
     #train_labels have been defined  globally
@@ -72,11 +76,21 @@ def train_top_model():
     # array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     model = Sequential()
     #model.add(Flatten(input_shape=train_data.shape[1:]))
-    model.add(Dropout(0.5, input_shape=(None, 1536)))
+    model.add(Dropout(0.2, input_shape=( 1536,)))
     model.add(Dense(80, activation='softmax'))
-
-    model.compile(optimizer=keras.optimizers.RMSProp(lr=0.0005), loss='categorical_crossentropy', metrics=['accuracy', top_3_categorical_accuracy])
-
+    
+    model.compile(optimizer=keras.optimizers.RMSprop(lr=0.0005), loss='categorical_crossentropy', metrics=['accuracy'])
+    train_labels=train_labels.reshape((len(train_labels),1))
+    trainmerge=np.append(train_data,train_labels,axis=1)
+    validation_labels=validation_labels.reshape((len(validation_labels),1))
+    validation_data=validation_data[:-20,:]
+    validationmerge=np.append(validation_data,validation_labels,axis=1)
+    np.random.shuffle(trainmerge)
+    train_data=trainmerge[:,:-1]
+    train_labels=trainmerge[:,-1]
+    validation_data=validationmerge[:,:-1]
+    validation_labels=validationmerge[:,-1]  
+    np.random.shuffle(validationmerge)
     model.fit(train_data, train_labels,
               epochs=epochs,
               batch_size=batch_size,
@@ -84,6 +98,6 @@ def train_top_model():
     model.save_weights(top_model_weights_path)
 
 
-save_features()
+#save_features()
 
 train_top_model()
