@@ -26,7 +26,7 @@ import pickle
 parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
 parser.add_argument('--lr', default=1e-3, type=float, help='learning_rate')
 parser.add_argument('--net_type', default='resnet50', type=str, help='model')
-parser.add_argument('--depth', default=50, type=int, help='depth of model')
+#parser.add_argument('--depth', default=50, type=int, help='depth of model')
 parser.add_argument('--finetune', '-f', action='store_true', help='Fine tune pretrained model')
 parser.add_argument('--addlayer','-a',action='store_true', help='Add additional layer in fine-tuning')
 parser.add_argument('--testOnly', '-t', action='store_true', help='Test mode with the saved model')
@@ -40,7 +40,7 @@ args = parser.parse_args()
 print('\n[Phase 1] : Data Preperation')
 
 data_dir = cf.test_dir
-trainset_dir = cf.data_base.split("/")[-1] + os.sep
+# = cf.data_base.split("/")[-1] + os.sep
 print("| Preparing %s dataset..." %(cf.test_dir.split("/")[-1]))
 
 use_gpu = torch.cuda.is_available()
@@ -68,7 +68,7 @@ def getNetwork(args):
     if (args.net_type == 'resnet50'):
         #net = resnet(args.finetune, args.depth)
 		net = load_model(args.net_type)
-        file_name = 'resnet-%s' %(args.depth)
+        file_name = args.net_type
     else:
         print('Error : Network should be either [VGGNet / ResNet]')
         sys.exit(1)
@@ -78,8 +78,8 @@ def softmax(x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)
 
 print("| Loading checkpoint model for feature extraction...")
-assert os.path.isdir('checkpoint'), 'Error: No checkpoint directory found!'
-assert os.path.isdir('checkpoint/'+trainset_dir), 'Error: No model has been trained on the dataset!'
+#assert os.path.isdir('checkpoint'), 'Error: No checkpoint directory found!'
+#assert os.path.isdir('checkpoint/'+trainset_dir), 'Error: No model has been trained on the dataset!'
 #_, file_name = getNetwork(args)
 model, file_name = getNetwork(args)
 #checkpoint = torch.load('./checkpoint/'+trainset_dir+file_name+'.t7')
@@ -96,7 +96,7 @@ if (args.net_type) == 'resnet50'):
     feature_map = list(model.module.children())
     feature_map.pop()
     extractor = nn.Sequential(*feature_map)
-
+	
 	
 	
 if use_gpu:
