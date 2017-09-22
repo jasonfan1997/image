@@ -18,7 +18,7 @@ import copy
 import sys
 import argparse
 from torchvision import datasets, models, transforms
-from networks import *
+#from networks import *
 from torch.autograd import Variable
 from PIL import Image
 import pickle
@@ -39,10 +39,7 @@ def parse_args():
 def main():
     global args
     args = parse_args()
-  
-  
-
-
+   
 
     # Phase 1 : Data Upload
     print('\n[Phase 1] : Data Preperation')
@@ -101,9 +98,10 @@ def main():
         new_classifier = nn.Sequential(*feature_map)
         extractor = copy.deepcopy(checkpoint['model'])
         extractor.module.classifier = new_classifier'''
-    if (args.net_type == 'resnet50'):
+    if (args.net_type == 'resnet50' or 'densenet161'):
         feature_map = list(model.children())
         feature_map.pop()
+        # * is used to unpack argument list
         extractor = nn.Sequential(*feature_map)
         
         
@@ -115,7 +113,7 @@ def main():
 
     model.eval()
     extractor.eval()
-
+    #both models use 224*224
     sample_input = Variable(torch.randn(1,3,224,224), volatile=True)
     if use_gpu:
         sample_input = sample_input.cuda()
@@ -135,9 +133,10 @@ def main():
         transforms.ToTensor(),
         #transforms.Normalize(cf.mean, cf.std)
     ])
-
-    if not os.path.isdir('vectors'):
-        os.mkdir('vectors')
+    
+    output_dir = args.net_type + '_output'
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
     print('Start saving.')
     count=0
     for subdir, dirs, files in os.walk(data_dir):
@@ -171,7 +170,7 @@ def main():
                 vector_dict['label'] = subdir[-2:]
                 #vector_dict['score'] = softmax_res[1]
 
-                vector_file = 'vectors' + os.sep + os.path.splitext(f)[0] + ".pickle"
+                vector_file = output_dir + os.sep + os.path.splitext(f)[0] + ".pickle"
 
                 '''
                 print(vector_file)
