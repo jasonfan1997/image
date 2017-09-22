@@ -15,9 +15,9 @@ import tensorflow as tf
 top_model_weights_path = 'top_model_res50_365.h5'
 train_data_dir = 'bottleneck_features_train.npy'
 validation_data_dir = 'bottleneck_features_validation.npy'
-train_labels = np.load('training_labels.npy')
-validation_labels = np.load('validation_labels.npy')
-nb_train_samples = len(train_labels)
+#train_labels = np.load('training_labels.npy')
+#validation_labels = np.load('validation_labels.npy')
+nb_train_samples = 53879
 nb_validation_samples = 7120
 epochs = 10
 batch_size = 1000
@@ -70,9 +70,13 @@ def train_top_model():
     train_labels=trainmerge[:,-1]
     validation_data=validationmerge[:,:-1]
     validation_labels=validationmerge[:,-1]'''  
+    
     #validation_labels=K.one_hot(validation_labels,80)
-    validation_labels=to_one_hot(validation_labels.flatten())
-    train_labels=to_one_hot(train_labels.flatten())
+    validation_labels=to_one_hot(validation_data[...,0].flatten())
+    train_labels=to_one_hot(train_data[...,0].flatten())
+    train_data = train_data[...,1:]
+    train_data = validation_data[...,1:]
+    
     model.load_weights(top_model_weights_path)
     model.fit(train_data, train_labels,
               epochs=epochs,

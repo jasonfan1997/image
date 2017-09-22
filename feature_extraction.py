@@ -23,6 +23,8 @@ from torch.autograd import Variable
 from PIL import Image
 import pickle
 
+
+
 def parse_args():
         
     parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
@@ -40,6 +42,7 @@ def main():
     global args
     args = parse_args()
    
+    test_dir = '../data/scene_classification/scene_train_images_20170904'
 
     # Phase 1 : Data Upload
     print('\n[Phase 1] : Data Preperation')
@@ -70,7 +73,7 @@ def main():
         '''if (args.net_type == '2333'):
             net = VGG(args.finetune, args.depth)
             file_name = 'vgg-%s' %(args.depth)'''
-        if args.net_type == 'resnet50':
+        if args.net_type == 'resnet50' or 'densenet161':
             #net = resnet(True, 50)
             net = load_model(args.net_type)
             file_name = args.net_type
@@ -98,12 +101,17 @@ def main():
         new_classifier = nn.Sequential(*feature_map)
         extractor = copy.deepcopy(checkpoint['model'])
         extractor.module.classifier = new_classifier'''
-    if (args.net_type == 'resnet50' or 'densenet161'):
+    if (args.net_type == 'resnet50'):
         feature_map = list(model.children())
         feature_map.pop()
         # * is used to unpack argument list
         extractor = nn.Sequential(*feature_map)
-        
+    elif args.net_type == 'densenet161':
+        feature_map = list(model.children())
+        feature_map.pop()
+        feature_map.append(nn.AvgPool2d(7))
+        # * is used to unpack argument list
+        extractor = nn.Sequential(*feature_map)        
         
         
     if use_gpu:
@@ -120,6 +128,8 @@ def main():
 
     sample_output = extractor(sample_input)
     featureSize = sample_output.size(1)
+    outputSize = sample_output.size()
+    print("| Output size = " + str(outputSize))
     print("| Feature dimension = %d" %featureSize)
 
     print("\n[Phase 3] : Feature & Score Extraction")
