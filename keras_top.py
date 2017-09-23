@@ -79,7 +79,7 @@ def train_top_model():
               batch_size=batch_size,
               validation_data=(validation_data, validation_labels))
     model.save_weights(top_model_weights_path)
-
+    model.save('model_'+top_model_weights_path)
 
 #save_features()
 

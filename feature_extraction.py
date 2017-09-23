@@ -13,8 +13,7 @@ import torch.backends.cudnn as cudnn
 import numpy as np
 import config as cf
 import torchvision
-import time
-import copy
+import json
 import sys
 import argparse
 from torchvision import datasets, models, transforms
@@ -23,7 +22,7 @@ from torch.autograd import Variable
 from PIL import Image
 import pickle
 
-
+top_model_path = '.h5'
 
 def parse_args():
         
@@ -37,7 +36,40 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-	
+def load_model(arch):
+    
+    #default resnet50
+    # load the pre-trained weights
+    model_weight = 'whole_%s_places365.pth.tar' % arch
+    if not os.access(model_weight, os.W_OK):
+        weight_url = 'http://places2.csail.mit.edu/models_places365/whole_%s_places365.pth.tar' % arch
+        os.system('wget ' + weight_url)
+    model = torch.load(model_weight)
+    return model
+
+
+def getNetwork(args):
+    '''if (args.net_type == '2333'):
+        net = VGG(args.finetune, args.depth)
+        file_name = 'vgg-%s' %(args.depth)'''
+    if args.net_type == 'resnet50' or 'densenet161':
+        #net = resnet(True, 50)
+        net = load_model(args.net_type)
+        file_name = args.net_type
+    else:
+        print('Error : Network should be either [VGGNet / ResNet]')
+        sys.exit(1)
+    return net, file_name
+
+def find_top_k(arr,k=3):
+    arr = arr.ravel()
+    ind = np.argpartition(arr, -k)[-k:]
+    ind = ind[np.argsort(-arr[ind])]
+    return list(ind)
+
+def softmax(x):
+    return np.exp(x) / np.sum(np.exp(x), axis=0)
+
 def main():
     global args
     args = parse_args()
@@ -55,36 +87,6 @@ def main():
 
     # Phase 2 : Model setup
     print('\n[Phase 2] : Model setup')
-
-
-    def load_model(arch):
-        
-        #default resnet50
-        # load the pre-trained weights
-        model_weight = 'whole_%s_places365.pth.tar' % arch
-        if not os.access(model_weight, os.W_OK):
-            weight_url = 'http://places2.csail.mit.edu/models_places365/whole_%s_places365.pth.tar' % arch
-            os.system('wget ' + weight_url)
-        model = torch.load(model_weight)
-        return model
-
-
-    def getNetwork(args):
-        '''if (args.net_type == '2333'):
-            net = VGG(args.finetune, args.depth)
-            file_name = 'vgg-%s' %(args.depth)'''
-        if args.net_type == 'resnet50' or 'densenet161':
-            #net = resnet(True, 50)
-            net = load_model(args.net_type)
-            file_name = args.net_type
-        else:
-            print('Error : Network should be either [VGGNet / ResNet]')
-            sys.exit(1)
-        return net, file_name
-
-    def softmax(x):
-        return np.exp(x) / np.sum(np.exp(x), axis=0)
-
 
     print("| Loading checkpoint model for feature extraction...")
     #assert os.path.isdir('checkpoint'), 'Error: No checkpoint directory found!'
@@ -132,6 +134,12 @@ def main():
     print("| Output size = " + str(outputSize))
     print("| Feature dimension = %d" %featureSize)
 
+
+    print("| Preparing top model")
+    top_model = keras.models.load(top_model_path)
+
+
+
     print("\n[Phase 3] : Feature & Score Extraction")
 
     def is_image(f):
@@ -171,9 +179,16 @@ def main():
                 inputs = inputs.view(1, inputs.size(0), inputs.size(1), inputs.size(2)) # add batch dim in the front
                 features = extractor(inputs).view(featureSize)
 
-                outputs = model(inputs)
+                #outputs = model(inputs)
                 #softmax_res = softmax(outputs.data.cpu().numpy()[0])
-
+                
+                logits = top_model.predict(output)
+                result = find_top_k(logits)
+                
+                #my_json_string = json.dumps({'image_id': f, 'label_id': result})
+                
+                
+                '''
                 vector_dict['file_path'] = file_path
                 #vector_dict['feature'] = features
                 vector_dict['feature'] = features.data.cpu().numpy()
@@ -182,15 +197,16 @@ def main():
 
                 vector_file = output_dir + os.sep + os.path.splitext(f)[0] + ".pickle"
 
-                '''
+                
                 print(vector_file)
                 print(subdir)
                 print(vector_dict['feature'].shape)
                 print(vector_dict['label'])
-                '''
+                
                 with open(vector_file, 'wb') as pkl:
                     pickle.dump(vector_dict, pkl, protocol=pickle.HIGHEST_PROTOCOL)
-                            
+                '''
+                
                 count +=1
                 if count % 100 == 0:
                     print('Count = ' + str(count))
