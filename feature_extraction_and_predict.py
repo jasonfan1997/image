@@ -135,8 +135,8 @@ def main():
     print("| Feature dimension = %d" %featureSize)
 
 
-    #print("| Preparing top model")
-    #top_model = keras.models.load(top_model_path)
+    print("| Preparing top model")
+    top_model = keras.models.load(top_model_path)
 
 
 
@@ -181,14 +181,14 @@ def main():
 
                 #outputs = model(inputs)
                 #softmax_res = softmax(outputs.data.cpu().numpy()[0])
-                '''
+                
                 logits = top_model.predict(output)
                 result = find_top_k(logits)
-                '''
+                
                 #my_json_string = json.dumps({'image_id': f, 'label_id': result})
                 
                 
-                
+                '''
                 vector_dict['file_path'] = file_path
                 #vector_dict['feature'] = features
                 vector_dict['feature'] = features.data.cpu().numpy()
@@ -197,15 +197,15 @@ def main():
 
                 vector_file = output_dir + os.sep + os.path.splitext(f)[0] + ".pickle"
 
-                '''
+                
                 print(vector_file)
                 print(subdir)
                 print(vector_dict['feature'].shape)
-                print(vector_dict['label'])'''
+                print(vector_dict['label'])
                 
                 with open(vector_file, 'wb') as pkl:
                     pickle.dump(vector_dict, pkl, protocol=pickle.HIGHEST_PROTOCOL)
-                
+                '''
                 
                 count +=1
                 if count % 100 == 0:
