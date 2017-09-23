@@ -11,15 +11,6 @@ import numpy as np
 import tensorflow as tf
 
 
-<<<<<<< HEAD
-top_model_weights_path = 'top_model_res50_365_one.h5'
-train_labels = np.load('training_labels.npy')
-validation_labels = np.load('validation_labels.npy')
-nb_train_samples = len(train_labels)
-nb_validation_samples = 7120
-epochs = 10
-batch_size = 20
-=======
 
 #arch = 'resnet'
 arch = 'desnet'
@@ -36,7 +27,7 @@ batch_size = 200
 
 
 
->>>>>>> ea8dc5e509c49b1d353d56bf026adfc8fb7d1a2c
+
 
 def to_one_hot(array):
     array=array.astype(np.int)
@@ -47,15 +38,6 @@ def top_3_categorical_accuracy(y_true, y_pred, k=3):
     return K.mean(K.in_top_k(y_pred, K.argmax(y_true, axis=-1), k))
 def train_top_model():
     np.random.seed(1)
-<<<<<<< HEAD
-    global train_labels
-    global validation_labels
-    train_data = np.load('resnet.npy')
-    #train_labels = np.array([0] * (nb_train_samples / 2) + [1] * (nb_train_samples / 2))
-    #train_labels have been defined  globally
-    
-    validation_data = np.load('resnetv.npy')
-=======
 
     global train_data
     #global validation_labels
@@ -67,19 +49,12 @@ def train_top_model():
 
 
 
->>>>>>> ea8dc5e509c49b1d353d56bf026adfc8fb7d1a2c
+
     #validation_labels = np.array([0] * (nb_validation_samples / 2) + [1] * (nb_validation_samples / 2))
     # array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     model = Sequential()
     #model.add(Flatten(input_shape=train_data.shape[1:]))
-<<<<<<< HEAD
-    model.add(Dropout(0.3, input_shape=(2048,)))
-    model.add(Dense(1000, activation='relu'))
-    '''
-    model.add(Dropout(0.3))
-    model.add(Dense(80, activation='softmax'))
-    '''
-=======
+
 
     model.add(Dropout(0.3, input_shape=(validation_data.shape[1]-1,)))
     #model.add(Dense(1000, activation='relu'))
@@ -89,7 +64,6 @@ def train_top_model():
     
 
 
->>>>>>> ea8dc5e509c49b1d353d56bf026adfc8fb7d1a2c
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy',top_3_categorical_accuracy])
     #keras.optimizers.RMSprop(lr=0.0005)
     np.random.shuffle(train_data)
