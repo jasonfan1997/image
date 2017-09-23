@@ -1,0 +1,43 @@
+densenet
+1 layer
+dropout0.2
+Epoch 10/10
+53879/53879 [==============================] - 12s - loss: 1.0084 - acc: 0.7137 - top_3_categorical_accuracy: 0.8860 - val_loss: 0.9352 - val_acc: 0.7215 - val_top_3_categorical_accuracy: 0.9038
+
+densenet
+1 layer
+dropout0.2
+bs 200
+Epoch 10/10
+Epoch 10/10
+53879/53879 [==============================] - 2s - loss: 1.0105 - acc: 0.7107 - top_3_categorical_accuracy: 0.8819 - val_loss: 0.8823 - val_acc: 0.7344 - val_top_3_categorical_accuracy: 0.9088
+
+merge
+1 ly
+dr 0.2
+bs 200
+Epoch 20
+53879/53879 [==============================] - 3s - loss: 0.6988 - acc: 0.7880 - top_3_categorical_accuracy: 0.9328 - val_loss: 0.9651 - val_acc: 0.7374 - val_top_3_categorical_accuracy: 0.9044
+
+merge
+1 ly
+dr 0.5
+bs 200
+Epoch 20
+53879/53879 [==============================] - 3s - loss: 0.9558 - acc: 0.7232 - top_3_categorical_accuracy: 0.8923 - val_loss: 0.8808 - val_acc: 0.7361 - val_top_3_categorical_accuracy: 0.9110
+
+merge
+1 ly
+dr 0.6
+bs 200
+Epoch 20/20
+53879/53879 [==============================] - 3s - loss: 1.1540 - acc: 0.6752 - top_3_categorical_accuracy: 0.8616 - val_loss: 0.8870 - val_acc: 0.7383 - val_top_3_categorical_accuracy: 0.9076
+Train on 53879 samples, validate on 7120 samples
+
+
+restnet
+1 ly
+dr 0.2
+bs 200
+Epoch 20
+53879/53879 [==============================] - 2s - loss: 1.0358 - acc: 0.7018 - top_3_categorical_accuracy: 0.8775 - val_loss: 1.0257 - val_acc: 0.6949 - val_top_3_categorical_accuracy: 0.8823

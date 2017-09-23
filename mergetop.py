@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Sep 23 10:22:51 2017
+
+@author: user98
+"""
+
 from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.preprocessing import image
 from keras.models import Model, Sequential
@@ -11,23 +18,13 @@ import numpy as np
 import tensorflow as tf
 
 
-
-#arch = 'resnet'
-arch = 'desnet'
-
-
-
-top_model_weights_path = 'top_model_'+arch+'_365_test03.h5'
-train_data = np.load(arch+'.npy')
+top_model_weights_path = 'top_model_dense50_365_merge05.h5'
+train_data = np.load('desnet.npy')
 #validation_labels = np.load('validation_labels.npy')
 nb_train_samples = len(train_data[:,0])
 nb_validation_samples = 7120
-epochs = 10
+epochs = 20
 batch_size = 200
-
-
-
-
 
 def to_one_hot(array):
     array=array.astype(np.int)
@@ -38,32 +35,27 @@ def top_3_categorical_accuracy(y_true, y_pred, k=3):
     return K.mean(K.in_top_k(y_pred, K.argmax(y_true, axis=-1), k))
 def train_top_model():
     np.random.seed(1)
-
     global train_data
     #global validation_labels
-    #train_data = np.load(arch+'.npy')
+    #train_data = np.load('desnet.npy')
+    train_data2 = np.load('resnet.npy')
     #train_labels = np.array([0] * (nb_train_samples / 2) + [1] * (nb_train_samples / 2))
     #train_labels have been defined  globally
     
-    validation_data = np.load(arch+'v.npy')
-
-
-
-
+    validation_data = np.load('desnetv.npy')
+    validation_data2 = np.load('resnetv.npy')
+    train_data=np.hstack((train_data,train_data2[:,1:]))
+    validation_data=np.hstack((validation_data,validation_data2[:,1:]))
     #validation_labels = np.array([0] * (nb_validation_samples / 2) + [1] * (nb_validation_samples / 2))
     # array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
     model = Sequential()
     #model.add(Flatten(input_shape=train_data.shape[1:]))
-
-
-    model.add(Dropout(0.3, input_shape=(validation_data.shape[1]-1,)))
-    #model.add(Dense(1000, activation='relu'))
+    model.add(Dropout(0.5, input_shape=(validation_data.shape[1]-1,)))
+    #model.add(Dense(1500, activation='relu'))
     
     #model.add(Dropout(0.2))
     model.add(Dense(80, activation='softmax'))
     
-
-
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy',top_3_categorical_accuracy])
     #keras.optimizers.RMSprop(lr=0.0005)
     np.random.shuffle(train_data)
@@ -82,7 +74,7 @@ def train_top_model():
               batch_size=batch_size,
               validation_data=(validation_data, validation_labels))
     model.save_weights(top_model_weights_path)
-    model.save('model_'+top_model_weights_path)
+
 
 #save_features()
 
