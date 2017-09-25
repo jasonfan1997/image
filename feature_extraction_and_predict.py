@@ -192,9 +192,9 @@ def main():
                     json.dumps({'label_id': result,'image_id': f },j)
                 
                 
-                '''
+                
                 vector_dict['file_path'] = file_path
-                #vector_dict['feature'] = features
+                vector_dict['feature'] = features
                 vector_dict['feature'] = features.data.cpu().numpy()
                 vector_dict['label'] = subdir[-2:]
                 #vector_dict['score'] = softmax_res[1]
@@ -209,7 +209,7 @@ def main():
                 
                 with open(vector_file, 'wb') as pkl:
                     pickle.dump(vector_dict, pkl, protocol=pickle.HIGHEST_PROTOCOL)
-                '''
+                
                 
                 count +=1
                 if count % 100 == 0:
