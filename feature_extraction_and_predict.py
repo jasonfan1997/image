@@ -11,6 +11,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.backends.cudnn as cudnn
 import numpy as np
+import keras
 import config as cf
 import torchvision
 import json
@@ -162,8 +163,9 @@ def main():
         os.mkdir(output_dir)
     print('Start saving.')
     count=0
+    
+    lst=[]
     for subdir, dirs, files in os.walk(data_dir):
-        
         for f in files:
             file_path = subdir + os.sep + f
             if (is_image(f)):
@@ -194,7 +196,16 @@ def main():
                 result = find_top_k(logits)
                                 
                 
-                
+                json_str=json.dumps({'image_id': f, 'label_id': result})
+                lst.append(json_str)
+                #my_json_string = json.dumps()
+                '''with open('result.json', 'w') as outfile:
+                    
+                    outfile.write('\n')
+                    json.dump({'image_id': f, 'label_id': result}, outfile)
+                    outfile.write('\n')'''
+                    
+                '''
                 vector_dict['file_path'] = file_path
                 vector_dict['feature'] = features
                 vector_dict['label'] = subdir[-2:]
@@ -216,7 +227,11 @@ def main():
                 count +=1
                 if count % 100 == 0:
                     print('Count = ' + str(count))
-                    
-
+    print('Writing output json...')                
+    to_write = str(lst).replace('\'','').replace('},','},\n')
+    with open('result.json', 'w') as outfile:
+        outfile.write(to_write)
+    print('All done.')
+    
 if __name__ == '__main__':
   main()
