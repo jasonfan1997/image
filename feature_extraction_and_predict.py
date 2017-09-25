@@ -14,7 +14,9 @@ import numpy as np
 import config as cf
 import torchvision
 import json
+from keras import backend as K
 import sys
+import keras
 import argparse
 from torchvision import datasets, models, transforms
 #from networks import *
@@ -22,13 +24,13 @@ from torch.autograd import Variable
 from PIL import Image
 import pickle
 
-top_model_path = '.h5'
+top_model_path = 'model_top_model_desnet_365_test03.pth'
 
 def parse_args():
         
     parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
     parser.add_argument('--lr', default=1e-3, type=float, help='learning_rate')
-    parser.add_argument('--net_type', default='resnet50', type=str, help='model')
+    parser.add_argument('--net_type', default='densenet161', type=str, help='model')
     #parser.add_argument('--depth', default=50, type=int, help='depth of model')
     parser.add_argument('--finetune', '-f', action='store_true', help='Fine tune pretrained model')
     parser.add_argument('--addlayer','-a',action='store_true', help='Add additional layer in fine-tuning')
@@ -47,6 +49,8 @@ def load_model(arch):
     model = torch.load(model_weight)
     return model
 
+def top_3_categorical_accuracy(y_true, y_pred, k=3):
+    return K.mean(K.in_top_k(y_pred, K.argmax(y_true, axis=-1), k))
 
 def getNetwork(args):
     '''if (args.net_type == '2333'):
@@ -74,7 +78,7 @@ def main():
     global args
     args = parse_args()
    
-    test_dir = '../data/scene_classification/scene_train_images_20170904'
+    test_dir = '../data/scene_classification/scene_test_a_images_20170922'
 
     # Phase 1 : Data Upload
     print('\n[Phase 1] : Data Preperation')
@@ -136,7 +140,7 @@ def main():
 
 
     print("| Preparing top model")
-    top_model = keras.models.load(top_model_path)
+    top_model = keras.models.load_model(top_model_path,custom_objects={'top_3_categorical_accuracy':top_3_categorical_accuracy})
 
 
 
@@ -184,8 +188,8 @@ def main():
                 
                 logits = top_model.predict(output)
                 result = find_top_k(logits)
-                
-                #my_json_string = json.dumps({'image_id': f, 'label_id': result})
+                with open('data.json', 'w') as j:
+                    json.dumps({'label_id': result,'image_id': f },j)
                 
                 
                 '''
