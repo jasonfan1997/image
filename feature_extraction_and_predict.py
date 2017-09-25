@@ -24,7 +24,7 @@ from torch.autograd import Variable
 from PIL import Image
 import pickle
 
-top_model_path = 'model_top_model_desnet_365_test03.pth'
+top_model_path = 'model_top_model_desnet_365_test03.h5'
 
 def parse_args():
         
@@ -78,12 +78,13 @@ def main():
     global args
     args = parse_args()
    
-    test_dir = '../data/scene_classification/scene_test_a_images_20170922'
+    data_dir = '../data/scene_classification/scene_test_a_images_20170922'
 
     # Phase 1 : Data Upload
     print('\n[Phase 1] : Data Preperation')
 
-    data_dir = cf.test_dir
+	
+    #data_dir = cf.test_dir
     # = cf.data_base.split("/")[-1] + os.sep
     print("| Preparing %s dataset..." %(cf.test_dir.split("/")[-1]))
 
@@ -182,23 +183,24 @@ def main():
                     inputs = inputs.cuda()
                 inputs = inputs.view(1, inputs.size(0), inputs.size(1), inputs.size(2)) # add batch dim in the front
                 features = extractor(inputs).view(featureSize)
-
-                #outputs = model(inputs)
+                features = features.data.cpu().numpy()
+                #features = np.transpose(features)
+                features=np.reshape(features,(1,len(features)))
+                print(features.shape)
+                #outputs = model(inputs) 
                 #softmax_res = softmax(outputs.data.cpu().numpy()[0])
                 
-                logits = top_model.predict(output)
+                logits = top_model.predict_on_batch(features)
                 result = find_top_k(logits)
-                with open('data.json', 'w') as j:
-                    json.dumps({'label_id': result,'image_id': f },j)
-                
+                                
                 
                 
                 vector_dict['file_path'] = file_path
                 vector_dict['feature'] = features
-                vector_dict['feature'] = features.data.cpu().numpy()
                 vector_dict['label'] = subdir[-2:]
                 #vector_dict['score'] = softmax_res[1]
-
+                vector_dict['top3'] = result
+				
                 vector_file = output_dir + os.sep + os.path.splitext(f)[0] + ".pickle"
 
                 
