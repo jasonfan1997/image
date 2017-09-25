@@ -22,7 +22,7 @@ train_data = np.load(arch+'.npy')
 #validation_labels = np.load('validation_labels.npy')
 nb_train_samples = len(train_data[:,0])
 nb_validation_samples = 7120
-epochs = 10
+epochs = 20
 batch_size = 200
 
 
@@ -76,13 +76,13 @@ def train_top_model():
     #validation_labels=K.one_hot(validation_labels,80)
     validation_labels=to_one_hot(validation_labels.flatten())
     train_labels=to_one_hot(train_labels.flatten())
-    #model.load_weights(top_model_weights_path)
+    model.load_weights(top_model_weights_path)
     model.fit(train_data, train_labels,
               epochs=epochs,
               batch_size=batch_size,
               validation_data=(validation_data, validation_labels))
     model.save_weights(top_model_weights_path)
-    model.save('model_'+top_model_weights_path)
+    model.save('model_'+top_model_weights_path.replace(".h5",".pth"))
 
 #save_features()
 
