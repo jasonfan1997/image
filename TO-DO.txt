@@ -1,0 +1,21 @@
+Plan
+(PyTorch)
+
+Extract feature before the first (or second?) block
+
+Extract the top layers from the pretrained network (directly take? or remove all previous layers? or rebuild and load parameters?)
+
+Replace the fully-connected layer
+
+Train fc only
+
+Train top fc and last block
+
+Train fc and last 2 blocks
+
+
+
+
+Info
+https://discuss.pytorch.org/t/weight-initilzation/157
+***https://discuss.pytorch.org/t/given-vgg16-how-to-remove-pool5-layer-and-all-the-classify-layers-and-how-to-add-new-layers-to-that-while-keeping-the-pretrained-weights/1653/4
