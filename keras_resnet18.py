@@ -37,7 +37,7 @@ def train_whole_net():
     
     img_width, img_height = 224, 224
 
-    top_model_weights_path = 'resnet18'
+    top_model_weights_path = 'resnet18_try1.h5'
     train_data_dir = '../data/scene_classification/scene_train_images_20170904'
     validation_data_dir = '../data/scene_classification/scene_validation_images_20170908'
     #train_labels = np.load('training_labels.npy')
