@@ -1,5 +1,5 @@
 
-from keras.applications.inception_resnet_v2 import InceptionResNetV2
+#from keras.applications.inception_resnet_v2 import InceptionResNetV2
 from keras.preprocessing import image
 from keras.models import Model, Sequential
 from keras.layers import Dense, GlobalAveragePooling2D,Dropout, Flatten
@@ -8,7 +8,8 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.metrics import top_k_categorical_accuracy, sparse_top_k_categorical_accuracy
 from keras import applications
 import keras
-import keras-resnet
+import keras_resnet
+import keras_resnet.models
 import numpy as np
 import tensorflow as tf
 
@@ -42,8 +43,8 @@ def train_whole_net():
     validation_data_dir = '../data/scene_classification/scene_validation_images_20170908'
     #train_labels = np.load('training_labels.npy')
     #validation_labels = np.load('validation_labels.npy')
-    #nb_train_samples = len(train_labels)
-    #nb_validation_samples = len(validation_labels)
+    nb_train_samples = 53879
+    nb_validation_samples = 7120
     epochs = 50
     batch_size = 100
     
@@ -75,6 +76,7 @@ def train_whole_net():
         batch_size=batch_size,
         class_mode='categorical',
         shuffle=True)
+    callback=keras.callbacks.ModelCheckpoint('weights.{epoch:02d}-{val_loss:.2f}.hdf5', monitor='val_loss', verbose=0, save_best_only=False, save_weights_only=False, mode='auto', period=10)
     model.fit_generator(
     train_generator,
     samples_per_epoch=nb_train_samples,
