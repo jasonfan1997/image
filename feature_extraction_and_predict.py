@@ -27,6 +27,11 @@ import pickle
 
 top_model_path = 'model_top_model_desnet_365_test03.h5'
 
+'''optimizer = optim.SGD(model.fc.parameters(), lr=1e-2, momentum=0.9)
+for param in model.parameters():
+    param.requires_grad = False'''
+
+
 def parse_args():
         
     parser = argparse.ArgumentParser(description='PyTorch Digital Mammography Training')
@@ -75,6 +80,14 @@ def find_top_k(arr,k=3):
 def softmax(x):
     return np.exp(x) / np.sum(np.exp(x), axis=0)
 
+def save_arch(arch):
+    with open(arch+'_pytorch.txt', 'w') as outfile:
+        outfile.write(str(model.named_modules))
+        '''for i in range(len(feature_map)):
+            outfile.write('Layer '+ str(i)+'\n')
+            outfile.write(str(feature_map[i])+'\n'+'\n')'''
+            
+            
 def main():
     global args
     args = parse_args()
