@@ -145,7 +145,7 @@ def main():
     if args.mode >= 2:
         for param in model.module.layer4.parameters():
             param.requires_grad = True
-        optimizer = torch.optim.SGD([model.module.fc.parameters(), model.module.layer4.parameters()], args.lr,
+        optimizer = torch.optim.SGD(list(model.module.fc.parameters())+list(model.module.layer4.parameters()), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
         '''optim.SGD([
